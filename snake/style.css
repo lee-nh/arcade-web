@@ -1,0 +1,295 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+body {
+    background: radial-gradient(circle at 50% 20%, #1e2638 0%, #0d111a 100%);
+    color: #e2e8f0;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+}
+
+.game-container {
+    background: rgba(22, 29, 45, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 240, 132, 0.05);
+    border-radius: 20px;
+    padding: 24px;
+    width: 100%;
+    max-width: 460px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+/* 헤더 & 점수판 */
+.game-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.game-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.15rem;
+    color: #00f084;
+    letter-spacing: 1px;
+    text-shadow: 0 0 12px rgba(0, 240, 132, 0.4);
+}
+
+.scoreboard {
+    display: flex;
+    gap: 12px;
+}
+
+.score-card {
+    background: #0f1523;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 6px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 72px;
+}
+
+.score-card .label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #718096;
+    letter-spacing: 1px;
+}
+
+.score-card .value {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1rem;
+    color: #ffffff;
+    margin-top: 4px;
+}
+
+/* 캔버스 및 오버레이 */
+.canvas-wrapper {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    max-width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 2px solid #2d3748;
+}
+
+#game-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background-color: #0c101a;
+}
+
+/* 오버레이 */
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 14, 23, 0.88);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 24px;
+    transition: opacity 0.25s ease, visibility 0.25s;
+    z-index: 10;
+}
+
+.overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.overlay-content h2 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.25rem;
+    color: #00f084;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.overlay-content p {
+    font-size: 0.9rem;
+    color: #a0aec0;
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+
+.final-stats {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 18px;
+    font-size: 1rem;
+    color: #f7fafc;
+}
+
+.final-stats.hidden {
+    display: none;
+}
+
+.final-stats span {
+    font-weight: bold;
+    color: #00f084;
+}
+
+/* 버튼 */
+.btn {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.15s ease;
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, #00f084 0%, #00bb67 100%);
+    color: #0b141a;
+    padding: 12px 24px;
+    font-size: 1rem;
+    box-shadow: 0 4px 14px rgba(0, 240, 132, 0.3);
+}
+
+.primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 240, 132, 0.45);
+}
+
+.primary-btn:active {
+    transform: translateY(0);
+}
+
+.icon-btn {
+    background: #1a2234;
+    color: #e2e8f0;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.icon-btn:hover {
+    background: #242f47;
+}
+
+/* 컨트롤 바 */
+.control-panel {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.difficulty-select {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #a0aec0;
+}
+
+.difficulty-select select {
+    background: #141c2c;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+    padding: 6px 10px;
+    border-radius: 8px;
+    outline: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.toggle-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+/* D-Pad (모바일 / 터치 지원) */
+.dpad-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.dpad-middle {
+    display: flex;
+    gap: 6px;
+}
+
+.dpad-btn {
+    width: 54px;
+    height: 48px;
+    background: #1a2234;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
+    font-size: 1.1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    touch-action: manipulation;
+    transition: background 0.1s, transform 0.1s;
+}
+
+.dpad-btn:active {
+    background: #00f084;
+    color: #081216;
+    transform: scale(0.94);
+}
+
+/* 풋터 가이드 */
+.game-footer {
+    font-size: 0.78rem;
+    color: #718096;
+    text-align: center;
+    line-height: 1.5;
+}
+
+kbd {
+    background: #1e2638;
+    border: 1px solid #4a5568;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    color: #e2e8f0;
+    font-family: inherit;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+}
+
+/* 화면 너비가 작을 때 */
+@media (max-width: 440px) {
+    .game-container {
+        padding: 16px;
+    }
+    .dpad-btn {
+        width: 50px;
+        height: 44px;
+    }
+}

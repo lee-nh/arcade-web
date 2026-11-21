@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RETRO ARCADE HUB | 5개 레트로 아케이드 게임 모음</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Press+Start+2P&family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0b10;
+      --card-bg: rgba(18, 20, 32, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --neon-cyan: #00f2fe;
+      --neon-pink: #ff2a85;
+      --neon-yellow: #ffd000;
+      --neon-green: #00ff88;
+      --neon-purple: #9d4edd;
+      --neon-orange: #ff6b35;
+      --text-main: #f1f2f6;
+      --text-sub: #8e94a8;
+      --font-retro: 'Press Start 2P', monospace;
+      --font-sci: 'Orbitron', sans-serif;
+      --font-body: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(79, 70, 229, 0.18) 0%, transparent 60%),
+        radial-gradient(circle at 10% 40%, rgba(255, 42, 133, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 70%, rgba(0, 242, 254, 0.08) 0%, transparent 40%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* CRT Scanline Overlay */
+    .crt-effect::before {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* Header */
+    header {
+      padding: 2.5rem 1.5rem 1.5rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .top-bar {
+      max-width: 1300px;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-sci);
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+
+    .badge-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 255, 136, 0.12);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      color: var(--neon-green);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+    }
+
+    .badge-live::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--neon-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--neon-green);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .header-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-tool {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-family: var(--font-sci);
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-tool:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+    }
+
+    .btn-tool.active {
+      border-color: var(--neon-pink);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(255, 42, 133, 0.4);
+    }
+
+    .marquee-title {
+      font-family: var(--font-retro);
+      font-size: clamp(1.8rem, 4.5vw, 3.2rem);
+      letter-spacing: 3px;
+      color: #fff;
+      text-transform: uppercase;
+      text-shadow: 
+        0 0 10px var(--neon-pink),
+        0 0 25px var(--neon-pink),
+        0 0 50px rgba(255, 42, 133, 0.5);
+      margin-bottom: 0.8rem;
+      animation: neon-glow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes neon-glow {
+      0% {
+        text-shadow: 0 0 8px var(--neon-pink), 0 0 20px var(--neon-pink);
+      }
+      100% {
+        text-shadow: 0 0 12px var(--neon-cyan), 0 0 35px var(--neon-cyan), 0 0 60px rgba(0, 242, 254, 0.6);
+      }
+    }
+
+    .subtitle {
+      font-family: var(--font-sci);
+      font-size: 0.95rem;
+      color: var(--text-sub);
+      letter-spacing: 2px;
+    }
+
+    .keyboard-hint {
+      display: inline-block;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: #a0a6b8;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+    }
+
+    .keyboard-hint kbd {
+      background: #202438;
+      color: var(--neon-yellow);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: var(--font-retro);
+      font-size: 0.7rem;
+      box-shadow: 0 2px 0 #10121d;
+      margin: 0 2px;
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1320px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 1.5rem 4rem;
+    }
+
+    /* Game Grid */
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .game-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Game Card */
+    .game-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 1.6rem;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .game-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--card-accent, var(--neon-cyan));
+      opacity: 0.8;
+      transition: all 0.3s ease;
+    }
+
+    .game-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--card-accent, var(--neon-cyan));
+      box-shadow: 
+        0 14px 35px -8px rgba(0, 0, 0, 0.7),
+        0 0 25px -5px var(--card-glow, rgba(0, 242, 254, 0.35));
+    }
+
+    .game-card:hover .game-visual {
+      transform: scale(1.03);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .game-number {
+      font-family: var(--font-retro);
+      font-size: 0.75rem;
+      color: var(--card-accent, var(--neon-cyan));
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .game-badge {
+      font-family: var(--font-sci);
+      font-size: 0.7rem;
+      padding: 3px 10px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.07);
+      color: #cbd5e1;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    /* Game Visual Banner */
+    .game-visual {
+      height: 180px;
+      border-radius: 12px;
+      margin-bottom: 1.2rem;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.4s ease;
+      background: #0d0f17;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Custom visual arts per game */
+    .visual-shooting {
+      background: radial-gradient(circle at center, #2c1654 0%, #0d091a 100%);
+    }
+    .visual-pacman {
+      background: radial-gradient(circle at center, #1b2838 0%, #080c12 100%);
+    }
+    .visual-breakout {
+      background: radial-gradient(circle at center, #0f3057 0%, #051424 100%);
+    }
+    .visual-tetris {
+      background: radial-gradient(circle at center, #351435 0%, #110515 100%);
+    }
+    .visual-snake {
+      background: radial-gradient(circle at center, #113626 0%, #05140d 100%);
+    }
+
+    .visual-icon {
+      font-size: 4.5rem;
+      filter: drop-shadow(0 0 18px var(--card-accent));
+      animation: float-anim 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes float-anim {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-8px) rotate(2deg); }
+    }
+
+    /* Game Info */
+    .game-title {
+      font-family: var(--font-retro);
+      font-size: 1.05rem;
+      color: #fff;
+      line-height: 1.4;
+      margin-bottom: 0.5rem;
+    }
+
+    .game-desc {
+      color: var(--text-sub);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      margin-bottom: 1.2rem;
+      flex-grow: 1;
+    }
+
+    .controls-preview {
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 1.3rem;
+      font-size: 0.78rem;
+      color: #a0aec0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .controls-preview span.tag {
+      color: var(--card-accent, var(--neon-cyan));
+      font-weight: 700;
+      font-family: var(--font-sci);
+    }
+
+    /* Action Buttons */
+    .card-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-play {
+      flex: 1;
+      background: var(--card-accent, var(--neon-cyan));
+      color: #0b0c10;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-family: var(--font-sci);
+      font-weight: 800;
+      font-size: 0.88rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-play:hover {
+      filter: brightness(1.2);
+      box-shadow: 0 0 15px var(--card-accent);
+    }
+
+    .btn-external {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-external:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: #fff;
+    }
+
+    /* Modal Player Container (Arcade Cabinet) */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(3, 4, 8, 0.92);
+      backdrop-filter: blur(12px);
+      z-index: 10000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .cabinet-window {
+      background: #111420;
+      border: 2px solid #2d334d;
+      border-radius: 16px;
+      width: 95%;
+      max-width: 920px;
+      height: 92vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 
+        0 25px 60px rgba(0, 0, 0, 0.9),
+        0 0 40px rgba(79, 70, 229, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cabinet-header {
+      background: #181c2e;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cabinet-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cabinet-title {
+      font-family: var(--font-retro);
+      font-size: 0.95rem;
+      color: var(--neon-cyan);
+    }
+
+    .cabinet-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cabinet-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: var(--font-sci);
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .cabinet-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .cabinet-btn.btn-close {
+      background: #e74c3c;
+      border-color: #c0392b;
+      font-weight: bold;
+    }
+
+    .cabinet-btn.btn-close:hover {
+      background: #c0392b;
+      box-shadow: 0 0 10px rgba(231, 76, 60, 0.6);
+    }
+
+    .cabinet-screen-wrapper {
+      flex: 1;
+      width: 100%;
+      height: calc(100% - 55px);
+      background: #000;
+      position: relative;
+    }
+
+    .cabinet-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      background: #000;
+    }
+
+    /* Keybind Guide Popup */
+    .keybind-bar {
+      background: #0f121d;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 6px 16px;
+      font-size: 0.75rem;
+      color: #718096;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .keybind-bar span.active-hint {
+      color: #a0aec0;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.8rem;
+      color: #555b6e;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-family: var(--font-sci);
+    }
+
+    footer a {
+      color: var(--neon-cyan);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body class="crt-effect">
+
+  <header>
+    <div class="top-bar">
+      <div class="badge-live">READY TO PLAY (5 GAMES LOADED)</div>
+      <div class="header-controls">
+        <button id="crt-toggle" class="btn-tool active" title="CRT 스캔라인 필터 On/Off">
+          <span>📺</span> CRT 필터
+        </button>
+        <button id="audio-toggle" class="btn-tool" title="효과음 사운드 토글">
+          <span>🔊</span> 사운드 ON
+        </button>
+      </div>
+    </div>
+
+    <h1 class="marquee-title">RETRO ARCADE</h1>
+    <div class="subtitle">★ CLASSIC 8-BIT & 90S ARCADE COLLECTION ★</div>
+    
+    <div class="keyboard-hint">
+      💡 팁: 키보드 번호 <kbd>1</kbd> ~ <kbd>5</kbd> 를 누르면 해당 게임이 즉시 실행됩니다! &nbsp;|&nbsp; 닫기는 <kbd>ESC</kbd>
+    </div>
+  </header>
+
+  <main>
+    <div class="game-grid">
+
+      <!-- 1. AERO STRIKE 1995 (Shooting) -->
+      <article class="game-card" 
+        style="--card-accent: #ff4757; --card-glow: rgba(255, 71, 87, 0.4);"
+        onclick="openGame('shooting', 'AERO STRIKE 1995', 'shooting/index.html', '방향키: 이동 | Space: 기관총 | B / X: 전멸 폭탄')">
+        <div class="card-top">
+          <span class="game-number">01</span>
+          <span class="game-badge">SHOOT 'EM UP</span>
+        </div>
+        <div class="game-visual visual-shooting">
+          <div class="visual-icon">🚀</div>
+        </div>
+        <h2 class="game-title">AERO STRIKE 1995</h2>
+        <p class="game-desc">
+          90년대 오락실 감성의 종스크롤 비행 슈팅 게임! 몰려오는 적 편대와 보스를 격파하고 파워업 아이템을 획득하세요.
+        </p>
+        <div class="controls-preview">
+          <span class="tag">KEY</span>
+          <span>방향키 (이동) · Space (발사) · B/X (폭탄)</span>
+        </div>
+        <div class="card-actions" onclick="event.stopPropagation()">
+          <button class="btn-play" onclick="openGame('shooting', 'AERO STRIKE 1995', 'shooting/index.html', '방향키: 이동 | Space: 기관총 | B / X: 전멸 폭탄')">
+            ▶ 플레이 (1)
+          </button>
+          <a href="shooting/index.html" target="_blank" class="btn-external" title="새 탭에서 열기">
+            ↗
+          </a>
+        </div>
+      </article>
+
+      <!-- 2. PAC-MAN (game_new) -->
+      <article class="game-card" 
+        style="--card-accent: #ffd700; --card-glow: rgba(255, 215, 0, 0.4);"
+        onclick="openGame('pacman', 'PAC-MAN', 'game_new/index.html', '방향키 또는 WASD: 이동 | Enter / Space: 시작 및 일시정지')">
+        <div class="card-top">
+          <span class="game-number">02</span>
+          <span class="game-badge">CLASSIC MAZE</span>
+        </div>
+        <div class="game-visual visual-pacman">
+          <div class="visual-icon">ᗧ···👻</div>
+        </div>
+        <h2 class="game-title">PAC-MAN</h2>
+        <p class="game-desc">
+          미로를 누비며 모든 쿠키와 파워 펠릿을 먹어치우세요! 4마리의 고스트(Blinky, Pinky, Inky, Clyde)를 피해 최고 기록에 도전하세요.
+        </p>
+        <div class="controls-preview">
+          <span class="tag">KEY</span>
+          <span>방향키 / WASD (이동) · Space (시작)</span>
+        </div>
+        <div class="card-actions" onclick="event.stopPropagation()">
+          <button class="btn-play" onclick="openGame('pacman', 'PAC-MAN', 'game_new/index.html', '방향키 또는 WASD: 이동 | Enter / Space: 시작 및 일시정지')">
+            ▶ 플레이 (2)
+          </button>
+          <a href="game_new/index.html" target="_blank" class="btn-external" title="새 탭에서 열기">
+            ↗
+          </a>
+        </div>
+      </article>
+
+      <!-- 3. BREAKOUT (breakout) -->
+      <article class="game-card" 
+        style="--card-accent: #00f2fe; --card-glow: rgba(0, 242, 254, 0.4);"
+        onclick="openGame('breakout', 'BREAKOUT CLASSIC', 'breakout/index.html', '마우스 또는 좌우 방향키: 패들 조작 | Space: 공 발사 및 시작')">
+        <div class="card-top">
+          <span class="game-number">03</span>
+          <span class="game-badge">BLOCK BREAKER</span>
+        </div>
+        <div class="game-visual visual-breakout">
+          <div class="visual-icon">🧱</div>
+        </div>
+        <h2 class="game-title">BREAKOUT</h2>
+        <p class="game-desc">
+          패들을 튕겨 벽돌을 격파하는 정통 브레이크아웃! 멀티볼, 레이저 캐논, 파이어볼 등 7가지 다양한 파워업 아이템을 활용하세요.
+        </p>
+        <div class="controls-preview">
+          <span class="tag">KEY</span>
+          <span>마우스 / 좌우 방향키 (패들) · Space (발사)</span>
+        </div>
+        <div class="card-actions" onclick="event.stopPropagation()">
+          <button class="btn-play" onclick="openGame('breakout', 'BREAKOUT CLASSIC', 'breakout/index.html', '마우스 또는 좌우 방향키: 패들 조작 | Space: 공 발사 및 시작')">
+            ▶ 플레이 (3)
+          </button>
+          <a href="breakout/index.html" target="_blank" class="btn-external" title="새 탭에서 열기">
+            ↗
+          </a>
+        </div>
+      </article>
+
+      <!-- 4. TETRIS (testris) -->
+      <article class="game-card" 
+        style="--card-accent: #a55eea; --card-glow: rgba(165, 94, 234, 0.4);"
+        onclick="openGame('tetris', 'CLASSIC TETRIS', 'testris/index.html', '방향키: 이동 및 회전 | Space: 하드드롭 | C/Shift: 홀드')">
+        <div class="card-top">
+          <span class="game-number">04</span>
+          <span class="game-badge">PUZZLE</span>
+        </div>
+        <div class="game-visual visual-tetris">
+          <div class="visual-icon">🧩</div>
+        </div>
+        <h2 class="game-title">TETRIS</h2>
+        <p class="game-desc">
+          블록을 정밀하게 쌓아 라인을 클리어하는 전설적인 퍼즐 게임! 홀드 기능, 넥스트 블록 미리보기 및 사운드 시스템을 완비했습니다.
+        </p>
+        <div class="controls-preview">
+          <span class="tag">KEY</span>
+          <span>방향키 (이동/회전) · Space (즉시낙하) · C (홀드)</span>
+        </div>
+        <div class="card-actions" onclick="event.stopPropagation()">
+          <button class="btn-play" onclick="openGame('tetris', 'CLASSIC TETRIS', 'testris/index.html', '방향키: 이동 및 회전 | Space: 하드드롭 | C/Shift: 홀드')">
+            ▶ 플레이 (4)
+          </button>
+          <a href="testris/index.html" target="_blank" class="btn-external" title="새 탭에서 열기">
+            ↗
+          </a>
+        </div>
+      </article>
+
+      <!-- 5. SNAKE (snake) -->
+      <article class="game-card" 
+        style="--card-accent: #2ed573; --card-glow: rgba(46, 213, 115, 0.4);"
+        onclick="openGame('snake', 'SNAKE GAME', 'snake/index.html', '방향키 또는 WASD: 방향 조작 | Space: 시작 및 일시정지')">
+        <div class="card-top">
+          <span class="game-number">05</span>
+          <span class="game-badge">RETRO ARCADE</span>
+        </div>
+        <div class="game-visual visual-snake">
+          <div class="visual-icon">🐍</div>
+        </div>
+        <h2 class="game-title">SNAKE</h2>
+        <p class="game-desc">
+          사과를 먹을수록 점점 길어지는 클래식 스네이크! 자신의 몸이나 벽에 부딪히지 않도록 빠르고 날렵하게 방향을 전환해보세요.
+        </p>
+        <div class="controls-preview">
+          <span class="tag">KEY</span>
+          <span>방향키 / WASD (이동) · Space (시작/정지)</span>
+        </div>
+        <div class="card-actions" onclick="event.stopPropagation()">
+          <button class="btn-play" onclick="openGame('snake', 'SNAKE GAME', 'snake/index.html', '방향키 또는 WASD: 방향 조작 | Space: 시작 및 일시정지')">
+            ▶ 플레이 (5)
+          </button>
+          <a href="snake/index.html" target="_blank" class="btn-external" title="새 탭에서 열기">
+            ↗
+          </a>
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+  <!-- Arcade Cabinet Modal -->
+  <div id="game-modal" class="modal-backdrop" onclick="handleBackdropClick(event)">
+    <div class="cabinet-window">
+      <div class="cabinet-header">
+        <div class="cabinet-title-group">
+          <span id="modal-game-icon">🕹️</span>
+          <h3 id="modal-game-title" class="cabinet-title">GAME TITLE</h3>
+        </div>
+        <div class="cabinet-controls">
+          <button class="cabinet-btn" onclick="restartCurrentGame()" title="게임 다시 시작">
+            <span>🔄</span> 다시시작
+          </button>
+          <button class="cabinet-btn" onclick="openInNewTab()" title="새 창에서 열기">
+            <span>↗</span> 새 탭
+          </button>
+          <button class="cabinet-btn" onclick="toggleFullscreen()" title="전체화면">
+            <span>⛶</span> 전체화면
+          </button>
+          <button class="cabinet-btn btn-close" onclick="closeGame()" title="로비로 돌아가기 (ESC)">
+            ✕ 나가기
+          </button>
+        </div>
+      </div>
+      <div class="cabinet-screen-wrapper">
+        <iframe id="game-frame" class="cabinet-iframe" src="" allowfullscreen></iframe>
+      </div>
+      <div class="keybind-bar">
+        <span id="modal-key-hint" class="active-hint">조작키 안내: -</span>
+        <span>오락실 허브로 나가기: [ESC] 키</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>RETRO ARCADE PORTAL &copy; 2026 &nbsp;|&nbsp; 5 WEB ARCADE GAMES EMBEDDED</p>
+  </footer>
+
+  <script>
+    // Audio Synthesizer for Retro UI sound effects
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playBeep(freq = 440, type = 'square', duration = 0.08) {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        // Audio policy or uninitialized
+      }
+    }
+
+    function playCoinSound() {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        const t = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(987.77, t); // B5
+        osc.frequency.setValueAtTime(1318.51, t + 0.08); // E6
+        gain.gain.setValueAtTime(0.08, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(t);
+        osc.stop(t + 0.35);
+      } catch (e) {}
+    }
+
+    // Games Metadata
+    const games = [
+      { id: 'shooting', title: 'AERO STRIKE 1995', url: 'shooting/index.html', icon: '🚀', keys: '방향키: 이동 | Space: 발사 | B, X: 전멸 폭탄' },
+      { id: 'pacman', title: 'PAC-MAN', url: 'game_new/index.html', icon: 'ᗧ', keys: '방향키 또는 WASD: 이동 | Enter/Space: 시작 및 정지' },
+      { id: 'breakout', title: 'BREAKOUT CLASSIC', url: 'breakout/index.html', icon: '🧱', keys: '마우스 또는 좌우 방향키: 패들 조작 | Space: 공 발사' },
+      { id: 'tetris', title: 'CLASSIC TETRIS', url: 'testris/index.html', icon: '🧩', keys: '방향키: 이동/회전 | Space: 하드드롭 | C, Shift: 홀드' },
+      { id: 'snake', title: 'SNAKE GAME', url: 'snake/index.html', icon: '🐍', keys: '방향키 또는 WASD: 방향 조작 | Space: 시작/일시정지' }
+    ];
+
+    let currentGameUrl = '';
+
+    const modal = document.getElementById('game-modal');
+    const iframe = document.getElementById('game-frame');
+    const modalTitle = document.getElementById('modal-game-title');
+    const modalIcon = document.getElementById('modal-game-icon');
+    const modalKeyHint = document.getElementById('modal-key-hint');
+    const crtBtn = document.getElementById('crt-toggle');
+    const audioBtn = document.getElementById('audio-toggle');
+
+    function openGame(id, title, url, keys) {
+      playCoinSound();
+      currentGameUrl = url;
+      modalTitle.textContent = title;
+      modalKeyHint.textContent = '조작키: ' + keys;
+      
+      const found = games.find(g => g.url === url);
+      modalIcon.textContent = found ? found.icon : '🕹️';
+
+      // Load game into iframe
+      iframe.src = url;
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      // Focus iframe so keyboard controls work immediately
+      setTimeout(() => {
+        try {
+          iframe.focus();
+          if (iframe.contentWindow) {
+            iframe.contentWindow.focus();
+          }
+        } catch(e) {}
+      }, 200);
+    }
+
+    function closeGame() {
+      playBeep(280, 'triangle', 0.1);
+      modal.classList.remove('active');
+      iframe.src = '';
+      currentGameUrl = '';
+      document.body.style.overflow = '';
+    }
+
+    function handleBackdropClick(e) {
+      if (e.target === modal) {
+        closeGame();
+      }
+    }
+
+    function restartCurrentGame() {
+      playBeep(520, 'square', 0.08);
+      if (currentGameUrl) {
+        iframe.src = currentGameUrl;
+        setTimeout(() => {
+          try {
+            iframe.focus();
+            if (iframe.contentWindow) iframe.contentWindow.focus();
+          } catch(e) {}
+        }, 150);
+      }
+    }
+
+    function openInNewTab() {
+      if (currentGameUrl) {
+        window.open(currentGameUrl, '_blank');
+      }
+    }
+
+    function toggleFullscreen() {
+      const cabinet = document.querySelector('.cabinet-window');
+      if (!document.fullscreenElement) {
+        if (cabinet.requestFullscreen) {
+          cabinet.requestFullscreen();
+        } else if (cabinet.webkitRequestFullscreen) {
+          cabinet.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Toggle CRT Scanlines
+    crtBtn.addEventListener('click', () => {
+      document.body.classList.toggle('crt-effect');
+      const active = document.body.classList.contains('crt-effect');
+      crtBtn.classList.toggle('active', active);
+      playBeep(active ? 600 : 300, 'sine', 0.05);
+    });
+
+    // Toggle Sound
+    audioBtn.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      audioBtn.classList.toggle('active', soundEnabled);
+      audioBtn.innerHTML = soundEnabled ? '<span>🔊</span> 사운드 ON' : '<span>🔇</span> 사운드 OFF';
+      if (soundEnabled) playBeep(700, 'triangle', 0.08);
+    });
+
+    // Global Keyboard Shortcuts (1~5 for games, ESC to close)
+    window.addEventListener('keydown', (e) => {
+      // If modal is active, ESC closes it
+      if (modal.classList.contains('active')) {
+        if (e.key === 'Escape') {
+          closeGame();
+        }
+        return;
+      }
+
+      // If typing in input, ignore
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+      const num = parseInt(e.key, 10);
+      if (num >= 1 && num <= 5) {
+        const game = games[num - 1];
+        if (game) {
+          openGame(game.id, game.title, game.url, game.keys);
+        }
+      }
+    });
+
+    // Button hover audio
+    document.querySelectorAll('.game-card, .btn-play, .btn-tool, .cabinet-btn').forEach(elem => {
+      elem.addEventListener('mouseenter', () => {
+        playBeep(880, 'sine', 0.03);
+      });
+    });
+  </script>
+</body>
+</html>

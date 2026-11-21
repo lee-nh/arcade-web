@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AERO STRIKE 1995 - 90s Arcade Plane Shooter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="arcade-container">
+        <!-- Arcade Marquee Header -->
+        <div class="arcade-header">
+            <div class="marquee-title">★ AERO STRIKE 1995 ★</div>
+            <div class="top-buttons">
+                <button id="toggleAudioBtn" class="retro-btn" title="Toggle Sound">AUDIO 🔊</button>
+                <button id="toggleCrtBtn" class="retro-btn" title="Toggle Scanlines">CRT: ON</button>
+            </div>
+        </div>
+
+        <!-- CRT Canvas Screen -->
+        <div class="screen-wrapper">
+            <canvas id="gameCanvas" width="480" height="640"></canvas>
+            <div id="scanlinesOverlay" class="scanlines"></div>
+        </div>
+
+        <!-- Mobile Touch Controls -->
+        <div class="touch-controls" id="touchControls">
+            <div class="d-pad">
+                <div></div>
+                <button class="d-btn" id="touchUp">▲</button>
+                <div></div>
+                <button class="d-btn" id="touchLeft">◀</button>
+                <div></div>
+                <button class="d-btn" id="touchRight">▶</button>
+                <div></div>
+                <button class="d-btn" id="touchDown">▼</button>
+                <div></div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn btn-bomb" id="touchBomb">BOMB</button>
+                <button class="action-btn btn-fire" id="touchFire">FIRE</button>
+            </div>
+        </div>
+
+        <!-- Arcade Machine Footer -->
+        <div class="arcade-footer">
+            <div class="controls-hint">[방향키/WASD]: 이동 | [Space/Z]: 자동발사 | [X]: 폭탄 | [P]: 일시정지</div>
+            <div>© 1995 RETRO ARCADE WORKSHOP. ALL RIGHTS RESERVED.</div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="audio.js"></script>
+    <script src="sprites.js"></script>
+    <script src="game.js"></script>
+    <script>
+        // CRT Scanline Toggle
+        const crtOverlay = document.getElementById('scanlinesOverlay');
+        const crtBtn = document.getElementById('toggleCrtBtn');
+        crtBtn.addEventListener('click', () => {
+            crtOverlay.classList.toggle('disabled');
+            crtBtn.textContent = crtOverlay.classList.contains('disabled') ? 'CRT: OFF' : 'CRT: ON';
+        });
+
+        // Audio Button Toggle
+        const audioBtn = document.getElementById('toggleAudioBtn');
+        audioBtn.addEventListener('click', () => {
+            window.retroAudio.init();
+            const muted = window.retroAudio.toggleMute();
+            audioBtn.textContent = muted ? 'AUDIO 🔇' : 'AUDIO 🔊';
+        });
+    </script>
+</body>
+</html>

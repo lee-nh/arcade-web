@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>브레이크아웃: 클래식 벽돌깨기 (Breakout Classic)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="game-container">
+    <!-- 상단 헤더 & 컨트롤 -->
+    <header class="game-header">
+      <div class="title-area">
+        <h1>BREAKOUT</h1>
+        <span class="subtitle">CLASSIC ARCADE</span>
+      </div>
+      <div class="header-controls">
+        <button id="crt-btn" class="icon-btn" title="CRT 브라운관 스캔라인 필터 토글">📺 CRT Off</button>
+        <button id="sound-btn" class="icon-btn" title="사운드 켜기/끄기">🔊 사운드</button>
+        <button id="pause-btn" class="icon-btn" title="일시 정지 (P/ESC)">⏸ 일시정지</button>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <!-- 중앙 메인 게임 보드 -->
+      <main class="board-wrapper">
+        <div class="canvas-container">
+          <canvas id="game-canvas" width="640" height="720"></canvas>
+          <div id="crt-layer" class="crt-overlay"></div>
+
+          <!-- 시작 오버레이 -->
+          <div id="start-overlay" class="overlay active">
+            <h2 class="start-title">BREAKOUT</h2>
+            <p>스페이스바, 마우스 클릭 또는 [게임 시작]을 눌러 공을 발사하세요!</p>
+            
+            <div class="items-preview">
+              <span class="preview-chip">↔ 패들 확장</span>
+              <span class="preview-chip">●● 멀티볼 3X</span>
+              <span class="preview-chip">▲ 레이저 캐논</span>
+              <span class="preview-chip">🔥 파이어볼</span>
+              <span class="preview-chip">🐢 슬로우</span>
+              <span class="preview-chip">🛡️ 바닥보호막</span>
+              <span class="preview-chip">💣 연쇄폭탄</span>
+            </div>
+
+            <button id="start-btn" class="primary-btn">게임 시작 (SPACE)</button>
+          </div>
+
+          <!-- 일시정지 오버레이 -->
+          <div id="pause-overlay" class="overlay">
+            <h2>PAUSED</h2>
+            <p>게임이 일시정지되었습니다.</p>
+            <button id="resume-btn" class="primary-btn">계속하기 (P)</button>
+          </div>
+
+          <!-- 스테이지 클리어 오버레이 -->
+          <div id="stage-clear-overlay" class="overlay">
+            <h2 id="stage-clear-title" class="clear-title">STAGE CLEAR! 🎉</h2>
+            <div id="stage-clear-desc" class="stage-summary">
+              스테이지 클리어 완료!
+            </div>
+            <button id="next-stage-btn" class="primary-btn">다음 스테이지 도전 (SPACE)</button>
+          </div>
+
+          <!-- 게임 오버 오버레이 -->
+          <div id="game-over-overlay" class="overlay">
+            <h2 class="gameover-title">GAME OVER</h2>
+            <div class="result-card">
+              <div class="result-row">
+                <span>최종 점수:</span>
+                <strong id="final-score" class="highlight-orange">0</strong>
+              </div>
+              <div class="result-row">
+                <span>최고 기록:</span>
+                <strong id="final-high-score" class="highlight-yellow">0</strong>
+              </div>
+              <div>
+                <span id="new-record-badge" class="new-record" style="display: none;">🏆 NEW RECORD!</span>
+              </div>
+            </div>
+            <button id="retry-btn" class="primary-btn">다시 도전 (SPACE)</button>
+          </div>
+        </div>
+
+        <!-- 모바일 터치 발사 버튼 -->
+        <div class="mobile-controls">
+          <button id="touch-launch-btn" class="touch-action-btn">🚀 공 발사 / 레이저 사격</button>
+        </div>
+      </main>
+
+      <!-- 우측 사이드바: 점수 & 정보 -->
+      <aside class="sidebar">
+        <!-- 스탯 패널 -->
+        <div class="panel">
+          <h2>STATS</h2>
+          <div class="stat-item">
+            <span class="stat-label">SCORE</span>
+            <span id="val-score" class="stat-value highlight-orange">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">HIGH SCORE</span>
+            <span id="val-high-score" class="stat-value highlight-yellow">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">STAGE</span>
+            <span id="val-level" class="stat-value highlight-cyan">1</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">LIVES</span>
+            <div id="lives-display" class="lives-box">
+              <span class="life-icon">❤️</span>
+              <span class="life-icon">❤️</span>
+              <span class="life-icon">❤️</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 콤보 패널 -->
+        <div id="combo-panel" class="panel combo-panel">
+          <h2>STREAK</h2>
+          <div id="val-combo" class="combo-text">2 COMBO!</div>
+        </div>
+
+        <!-- 활성 파워업 아이템 -->
+        <div class="panel">
+          <h2>POWER-UPS</h2>
+          <div id="active-powerups" class="powerup-box">
+            <span class="powerup-empty-hint">획득한 파워업 없음</span>
+          </div>
+        </div>
+
+        <!-- 조작 안내 -->
+        <div class="panel">
+          <h2>CONTROLS</h2>
+          <ul class="help-list">
+            <li><span>패들 이동</span><span class="help-key">← → / 마우스</span></li>
+            <li><span>공 발사</span><span class="help-key">Space / 클릭</span></li>
+            <li><span>레이저 사격</span><span class="help-key">Space / 클릭</span></li>
+            <li><span>일시정지</span><span class="help-key">P / Esc</span></li>
+            <li><span>사운드</span><span class="help-key">M</span></li>
+            <li><span>CRT 필터</span><span class="help-key">C</span></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- 스크립트 로드 -->
+  <script src="audio.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
